@@ -1,0 +1,170 @@
+# SaaS Platform for Classes and Bookings
+
+## Project Setup
+
+### Prerequisites
+1. Java 8
+2. Maven 3.6+
+3. Spring Boot 3.3.4
+
+### Steps to Run
+
+1. Clone the repository
+2. Run `mvn clean install` to build the project.
+3. Use `mvn spring-boot:run` to start the application.
+4. Access the H2 console at `http://localhost:8080/h2-console`.
+.
+
+### API Endpoints
+1. **POST** `/api/classes`: Create a new class.
+2. **POST** `/api/bookings`: Book a class for a member.
+
+### Testing
+
+Run `mvn test` to execute the JUnit test cases.
+
+
+
+### test cases
+
+1. Class Creation API (/classes)
+
+Class name: Yoga, Start date: 2024-12-01, End date: 2024-12-20, Capacity: 15
+json
+Copy code
+{
+  "className": "Yoga",
+  "startDate": "2024-12-01",
+  "endDate": "2024-12-20",
+  "capacity": 15
+}
+
+_____________
+Single-day Class Creation
+
+Class name: HIIT, Start date: 2024-12-05, End date: 2024-12-05, Capacity: 10
+json
+Copy code
+{
+  "className": "HIIT",
+  "startDate": "2025-12-05",
+  "endDate": "2025-12-05",
+  "capacity": 10
+}
+------------
+
+Negative Scenarios
+Start Date After End Date
+
+json
+Copy code
+{
+  "className": "HIIT",
+  "startDate": "2025-12-06",
+  "endDate": "2025-12-05",
+  "capacity": 10
+}
+Expected Response: 400 Bad Request
+Error Message: "Start date cannot be after end date."
+___________________________
+Overlapping Class Dates
+
+Assuming a class "Yoga" exists from 2024-12-01 to 2024-12-20
+json
+Copy code
+{
+  "className": "Zumba",
+  "startDate": "2024-12-15",
+  "endDate": "2024-12-25",
+  "capacity": 10
+}
+Expected Response: 400 Bad Request
+Error Message: "Class dates overlap with an existing class."
+___________________________________-
+Invalid Capacity
+
+json
+Copy code
+{
+  "className": "Kickboxing",
+  "startDate": "2025-12-10",
+  "endDate": "2025-12-15",
+  "capacity": -5
+}
+Expected Response: 400 Bad Request
+Error Message: "Capacity must be a positive integer."
+
+
+--------------------------
+2. Booking API (/bookings)
+Positive Scenarios
+Valid Booking within Class Dates
+
+Class ID: 1, Member name: John Doe, Booking date: 2024-12-03
+json
+Copy code
+{
+  "classId": 1,
+  "memberName": "John Doe",
+  "bookingDate": "2024-12-03",
+"className": "Kickboxing"
+}
+
+__________________________
+Booking on the Last Day of Class
+
+Class ID: 1, Member name: Jane Smith, Booking date: 2024-12-20
+json
+Copy code
+{
+  "classId": 1,
+"className": "HIIT",
+  "memberName": "Jane Smith",
+  "bookingDate": "2024-12-20"
+}
+
+
+_____________________
+Negative Scenarios
+Booking Outside Class Date Range
+
+Assuming the class with ID 1 runs from 2024-12-01 to 2024-12-20
+json
+Copy code
+{
+  "classId": 1,
+"className": "HIIT",
+  "memberName": "Jane Smith",
+  "bookingDate": "2024-12-21"
+}
+
+Expected Response: 400 Bad Request
+Error Message: "Booking date is outside the class schedule."
+_______________________
+Non-existent Class ID
+
+json
+Copy code
+{
+  "classId": 999,
+"className": "Kickboxing",
+  "memberName": "Emma Stone",
+  "bookingDate": "2024-12-03"
+}
+Expected Response: 404 Not Found
+Error Message: "Class not found"
+_____________________________
+Booking Exceeding Capacity (If capacity validation is enabled)
+
+Assuming class ID 1 has reached its capacity
+json
+Copy code
+{
+  "classId": 1,
+  "memberName": "Chris Evans",
+  "bookingDate": "2024-12-03"
+}
+
+
+sample queries:
+SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS -->to know constraints
